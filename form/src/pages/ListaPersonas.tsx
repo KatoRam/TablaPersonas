@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function BasicTable() {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<any[]>();
   useEffect(() => {
     personaService.getAll().then((response) => setData(response.data ?? []));
