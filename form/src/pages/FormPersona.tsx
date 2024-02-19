@@ -1,31 +1,37 @@
-import { Button, SelectChangeEvent, Grid } from '@mui/material'
-import { Form, TextFieldInput, DatePickerInput, SelectInput, RadioGroupInput, Wait, TextFieldNumber } from '../components/forms'
+import { Button, Grid } from '@mui/material'
+import { Form, TextFieldInput, DatePickerInput, RadioGroupInput, Wait, TextFieldNumber } from '../components/forms'
 import IPersona from '../types/IPersona';
 import personaService from '../services/PersonaService';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 
 export default function FormPersona() {
   const navigate = useNavigate();
   const { personaId } = useParams();
-  const [personaData, setPersonaData] = useState<any>();
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (personaId) {
-      setIsLoading(true);
-      personaService.get(personaId).then((response) => {
-        setPersonaData(response.data ?? []);
-        setIsLoading(false);
-      }
-      );
+
+  const addPersona = useMutation(async (formData: IPersona) => (await personaService.create(formData)).data, {
+    onSuccess: () => {
+      alert("se guardaron los cambios")
     }
-  }, []);
+  });
+  const updPersona = useMutation(async (formData: IPersona) => (await personaService.update(formData)).data, {
+    onSuccess: () => {
+      alert("Se actualizaron los cambios")
+    }
+  });
+
+  const { isLoading, error, data } = useQuery(['updatePersonasById',personaId], async ()=> (await personaService.get(personaId)).data)
+
 
 
   const onSubmit = (data: IPersona) => {
-    setIsLoading(true);
-    personaService.create(data);
+    console.log(data);
+    if (data.id) {
+      updPersona.mutate(data);
+    } else {
+      addPersona.mutate(data);
+    }
     navigate(-1);
   }
 
@@ -34,27 +40,17 @@ export default function FormPersona() {
   }
 
 
-  const options = [
-    { value: 1, label: "ola" },
-    { value: 2, label: "pez" },
-    { value: 3, label: "si" }
-  ]
-
   const radioOptions = [
     { value: "Hombre", label: "Hombre" },
     { value: "Mujer", label: "Mujer" },
     { value: "Otros", label: "Otros" }
   ]
 
-  const onChange = (event: SelectChangeEvent) => {
-    console.log(event.target.value)
-  }
-
   return (
     <>
       <h2>Agregar Personas</h2>
       <Wait isLoading={isLoading}>
-        <Form onSubmit={onSubmit} defaultValue={personaData} >
+        <Form onSubmit={onSubmit} defaultValue={data} >
 
           <Grid container spacing={4} columns={1}>
 
@@ -71,7 +67,7 @@ export default function FormPersona() {
             </Grid>
 
             <Grid item xs={8}>
-              <TextFieldNumber nombre='edad' label='Edad'  />
+              <TextFieldNumber nombre='edad' label='Edad' />
             </Grid>
 
             <Grid item xs={8}>

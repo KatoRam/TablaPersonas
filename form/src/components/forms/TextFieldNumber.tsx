@@ -21,7 +21,7 @@ const TextFieldNumber = ({ nombre, label, defaultValue }: TextFieldNumberProps) 
                     label={label}
                     type="number"
                     onChange={(event: any) => {
-                        onChange(event.target.value || null);
+                        onChange(event.target.value || '');
                     }}
                 />
             )}

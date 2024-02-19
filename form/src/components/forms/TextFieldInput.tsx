@@ -7,7 +7,6 @@ interface TextFieldInputProps {
     defaultValue?: string;
 }
 
-
 const TextFieldInput = ({ nombre, label, defaultValue }: TextFieldInputProps) => {
     const { control } = useFormContext();
     return (
@@ -21,7 +20,7 @@ const TextFieldInput = ({ nombre, label, defaultValue }: TextFieldInputProps) =>
                     value={value ?? ""}
                     label={label}
                     onChange={(event: any) => {
-                        onChange(event.target.value || null);
+                        onChange(event.target.value || '');
                     }}
                 />
             )}
